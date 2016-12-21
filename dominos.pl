@@ -36,12 +36,59 @@ getValidPlacementVertical(piece(A,B), Places):-
     labeling([], Places).*/
 
 isValidPlacement(Line, Col, piece(A,B), Dir):- getElement(Line, Col, A), ((Line1 is Line+1, getElement(Line1, Col, B), Dir is 0);
-                                                                     ((Col1 is Col+1), getElement(Line, Col1, B), Dir is 1)).
+                                                                         ((Col1 is Col+1), getElement(Line, Col1, B), Dir is 1)).
 
-listValidPlacements(piece(A,B), Output):- findall([piece(A,B), Line, Col, Dir], isValidPlacement(Line, Col, piece(A,B), Dir), Output).
+listValidPlacements(piece(A,B), Output):- findall(Line-Col-Dir, isValidPlacement(Line, Col, piece(A,B), Dir), Output).
 
-listAllPlacements([Pieces|PiecesS], Input, Output):- listValidPlacements(Pieces, Intermediate), append(Input, Intermediate, Intermediate2),
-                                                     listAllPlacements(PiecesS, Intermediate2, Output).
-listAllPlacements([], I, O):- sort(I, O).
+listPlacement([Pieces|PiecesS], [Intermediate|I]):- listValidPlacements(Pieces, Intermediate),
+                                                       listPlacement(PiecesS, I).
+listPlacement([], []).
 
-listAllPlacements(Placements):- generate_pieces(4, Pieces), listAllPlacements(Pieces, [], Placements), write(Placements).
+
+listAllPlacements(Placements,Pieces):-  listAllPlacement(Pieces,Placements),!.
+
+
+bindSolution(L,C,D,[]):- L #= -1, C #= -1, D #= 2.
+bindSolution(L,C,D,S):- member(L-C-D,S).
+    
+
+
+validPlace([],[],[],_):-write('end').
+validPlace([L1|Ls],[C1|Cs],[D1|Ds],[S1|Ss]):-
+                bindSolution(L1,C1,D1,S1),
+                validPlace(Ls,Cs,Ds,Ss).
+
+
+resolveDomino(Width,Height,N,Pieces):-
+    length(Line,N),
+    length(Col,N),
+    length(Direction,N),
+
+    domain(Line,-1,Width),
+    domain(Col,-1,Height),
+    domain(Direction,0,2),
+
+    listAllPlacements(Places,Pieces),
+    validPlace(Line,Col,Direction,Places),
+
+    labeling([],Line),
+    labeling([],Col),
+    labeling([],Direction),
+    write('\n'),
+    write(Line),
+    write('\n'),
+    write(Col),
+    write('\n'),
+    write(Direction).
+
+
+
+test:-    generate_pieces(8, Pieces),length(Pieces,N), resolveDomino(8,8,N,Pieces).
+
+
+test2:- generate_pieces(8, Pieces), write(Pieces),
+        listAllPlacements(Placements,Pieces),printa(Pieces,Placements).
+
+
+printa([],[]).
+printa([P|Ps],[S|Ss]):-write(P),write('   '), write(S), write('\n'), printa(Ps,Ss).
