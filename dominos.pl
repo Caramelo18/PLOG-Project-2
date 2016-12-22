@@ -237,12 +237,13 @@ compileOptions([L-C-1|Ps],East,South,[O|Os],MaxLine,MaxCol):-
 
 % TODO O dominio de  line e COl ta certo ???  nao é  Width -1 e ...
 
-resolveDomino(Width,Height,Pieces):-
+resolveDomino(Width,Height,Pieces,East,South):-
 
     createSpaces(Width,Height,East),
     createSpaces(Width,Height,South),
-    domain(East,0,1),
-    domain(South,0,1),
+
+    append(East,South,Solution),
+    domain(Solution,0,1),
 
     restrictNeighbors(Height,Width,1,1,East,South),
 
@@ -254,27 +255,13 @@ resolveDomino(Width,Height,Pieces):-
 
 
     placement(Places,East,South,Height,Width),
-    write('passou \n'),
-    %validPlace(Line,Col,Direction,Places),
-
-
-    /*labeling([],Line),
-    labeling([],Col),
-    labeling([],Direction),
-    write('\n'),
-    write(Pieces),
-    write('\n'),
-    write(Line),
-    write('\n'),
-    write(Col),
-    write('\n'),
-    write(Direction).*/
-    append(East,South,Solution),
+    write('passou \n'),   
     labeling([], Solution),
     write(East), write('\n'),
     write(South), write('\n').
 
-test:-    generate_pieces(4, Pieces), length(Pieces,N), write(N), write('\n'),!, resolveDomino(6,5,Pieces).
+test:-    Width is  6,Height is 5, generate_pieces(4, Pieces), length(Pieces,N), write(N), write('\n'),!, resolveDomino(Width,Height,Pieces,East,South),
+          !,table1(X),!,write('\n'), printSolution(X,East,South,1,Width).
 
 
 test2:- generate_pieces(4, Pieces), write(Pieces),
@@ -284,6 +271,34 @@ test4:- notEmpty(4,7).
 
 printa([],[]).
 printa([P|Ps],[S|Ss]):-write(P),write('   '), write(S), write('\n'), printa(Ps,Ss).
+
+
+/** DISPLAY SOLUTION SECTION */
+
+printSolution([],_,_,_,_):- write('\n').
+printSolution([Line|Lines],East,South,Count,Width):-printEast(Line,East,Count),
+                                                    printSouth(Line,South,Count),
+                                                    NewCount is Count +Width,    
+                                                    printSolution(Lines,East,South,NewCount,Width).
+
+printEast([],_,_):- write('\n').
+% No border
+printEast([P|Ps],East,Count):- nth1(Count,East,0),write(P), write('   '),
+                               NewCount is Count +1,
+                               printEast(Ps,East,NewCount).
+% with boarder
+printEast([P|Ps],East,Count):- nth1(Count,East,1),write(P), write(' | '),
+                               NewCount is Count +1,
+                               printEast(Ps,East,NewCount).
+ printSouth([],_,_):- write('\n').
+ printSouth([P|Ps],South,Count):-nth1(Count,South,1), write('__  '),
+                                 NewCount is Count +1,
+                                 printSouth(Ps,South,NewCount).
+ printSouth([P|Ps],South,Count):-nth1(Count,South,0), write('    '),
+                                 NewCount is Count +1,
+                                 printSouth(Ps,South,NewCount).
+
+
 
 
 test3:-createSpaces(6,5,East), createSpaces(6,5,South), restrictNeighbors(6,5,5,1,East,South). %restrictNeighbors(6,5, 0, 0, East, South).
