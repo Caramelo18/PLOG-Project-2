@@ -32,7 +32,7 @@ isValidPlacement(Line, Col, piece(A,B), Dir):- getElement(Line, Col, A), ((Line1
 listValidPlacements(piece(A,B), Result):- findall(Line-Col-Dir, isValidPlacement(Line, Col, piece(A,B), Dir), Output),
                                           findall(Line-Col-Dir, isValidPlacement(Line, Col, piece(B,A), Dir), Output2),
                                           append(Output,Output2,R),sort(R,Result).
-                                                    
+
 listPlacement([Pieces|PiecesS], [Intermediate|I]):- listValidPlacements(Pieces, Intermediate),
                                                        listPlacement(PiecesS, I).
 listPlacement([], []).
@@ -134,7 +134,7 @@ restrictNeighbors(MaxLine,MaxCol,MaxLine,Col,East,South):- notEmpty(MaxLine,Col)
                                                              element(Left,East,WestBorder),
                                                              element(SpaceIndex,South,SouthBorder),
 
-                                                             SouthBorder #= 0,     
+                                                             SouthBorder #= 0,
 
                                                              NorthBorder + EastBorder + WestBorder + SouthBorder#= 1,
 
@@ -146,8 +146,9 @@ restrictNeighbors(MaxLine,MaxCol,Line,1,East,South):- notEmpty(Line,1),
                                                       write(Line), write(' 1'), write('\n'),
                                                       % only up down right
 
-                                                      SpaceIndex is (Line-1) * MaxLine + 1,
-                                                      Up is SpaceIndex - Line,
+                                                      SpaceIndex is (Line-1) * MaxCol + 1,
+                                                      write(SpaceIndex),
+                                                      Up is SpaceIndex - MaxCol,
 
                                                        element(Up,South,NorthBorder),
                                                        element(SpaceIndex,East,EastBorder),
@@ -236,16 +237,7 @@ compileOptions([L-C-1|Ps],East,South,[O|Os],MaxLine,MaxCol):-
 
 % TODO O dominio de  line e COl ta certo ???  nao é  Width -1 e ...
 
-resolveDomino(Width,Height,N,Pieces):-
-    length(Line,N),
-    length(Col,N),
-    length(Direction,N),
-
-
-    domain(Line,0,Width),
-    domain(Col,0,Height),
-    domain(Direction,0,1),
-
+resolveDomino(Width,Height,Pieces):-
 
     createSpaces(Width,Height,East),
     createSpaces(Width,Height,South),
@@ -282,7 +274,7 @@ resolveDomino(Width,Height,N,Pieces):-
     write(East), write('\n'),
     write(South), write('\n').
 
-test:-    generate_pieces(4, Pieces), length(Pieces,N), write(N), write('\n'),!, resolveDomino(6,5,14,Pieces).
+test:-    generate_pieces(4, Pieces), length(Pieces,N), write(N), write('\n'),!, resolveDomino(6,5,Pieces).
 
 
 test2:- generate_pieces(4, Pieces), write(Pieces),
