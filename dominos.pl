@@ -29,8 +29,10 @@ getElement(Row, Col, Element):- table1(Board), getRow(Board, Row, ERow), getCol(
 isValidPlacement(Line, Col, piece(A,B), Dir):- getElement(Line, Col, A), ((Line1 is Line+1, getElement(Line1, Col, B), Dir is 0); %Vertical
                                                                          ((Col1 is Col+1), getElement(Line, Col1, B), Dir is 1)). %Horizontal
 
-listValidPlacements(piece(A,B), Output):- findall(Line-Col-Dir, isValidPlacement(Line, Col, piece(A,B), Dir), Output).
-
+listValidPlacements(piece(A,B), Result):- findall(Line-Col-Dir, isValidPlacement(Line, Col, piece(A,B), Dir), Output),
+                                          findall(Line-Col-Dir, isValidPlacement(Line, Col, piece(B,A), Dir), Output2),
+                                          append(Output,Output2,R),sort(R,Result).
+                                                    
 listPlacement([Pieces|PiecesS], [Intermediate|I]):- listValidPlacements(Pieces, Intermediate),
                                                        listPlacement(PiecesS, I).
 listPlacement([], []).
@@ -65,6 +67,8 @@ createSpaces(L,C,Array):- Total is C * L,
 
 
 notEmpty(Line,Col):- getElement(Line,Col,Element),  Element \== e.
+
+/** FIRST RESCTRICTION */
 
 /** FIRST LINE & FIRST COL */
 restrictNeighbors(MaxLine,MaxCol,1,1,East,South):- notEmpty(1,1),
@@ -128,8 +132,11 @@ restrictNeighbors(MaxLine,MaxCol,MaxLine,Col,East,South):- notEmpty(MaxLine,Col)
                                                              element(Up,South,NorthBorder),
                                                              element(SpaceIndex,East,EastBorder),
                                                              element(Left,East,WestBorder),
+                                                             element(SpaceIndex,South,SouthBorder),
 
-                                                             NorthBorder + EastBorder + WestBorder #= 1,
+                                                             SouthBorder #= 0,     
+
+                                                             NorthBorder + EastBorder + WestBorder + SouthBorder#= 1,
 
                                                             write(MaxLine), write(' '), write(Col), write('\n'),
                                                             NextCol is Col + 1,
@@ -152,7 +159,7 @@ restrictNeighbors(MaxLine,MaxCol,Line,1,East,South):- notEmpty(Line,1),
 restrictNeighbors(MaxLine,MaxCol,Line,MaxCol,East,South):- notEmpty(Line,MaxCol),
                                                            write(Line),write(MaxCol), write(' MAX COL\n'),
                                                            NextLine is Line + 1,
-                                                           % only up, down, left
+                                                           % up, down, left rigth
 
                                                            SpaceIndex is Line * MaxCol,
                                                            Up is SpaceIndex - MaxCol,
@@ -161,8 +168,10 @@ restrictNeighbors(MaxLine,MaxCol,Line,MaxCol,East,South):- notEmpty(Line,MaxCol)
                                                               element(Up,South,NorthBorder),
                                                               element(Left,East,WestBorder),
                                                               element(SpaceIndex,South,SouthBorder),
+                                                              element(SpaceIndex,East,EastBorder),
 
-                                                              NorthBorder + WestBorder + SouthBorder #= 1,
+                                                              EastBorder #= 0,
+                                                              NorthBorder + WestBorder + SouthBorder + EastBorder #= 1,
 
                                                            restrictNeighbors(MaxLine,MaxCol,NextLine,1,East,South).
 
@@ -172,7 +181,7 @@ restrictNeighbors(MaxLine,MaxCol,Line,Col,East,South):-  notEmpty(Line,Col),
                                                          write(Line), write(' '),write(Col), write(' \n'),
                                                          % up down left right
 
-                                                         SpaceIndex is (Line - 1) * MaxLine + Col + (Line - 1),
+                                                        SpaceIndex is (Line - 1) * MaxCol + Col ,
                                                          Up is SpaceIndex - MaxCol,
                                                          Left is SpaceIndex - 1,
 
@@ -200,6 +209,31 @@ restrictNeighbors(MaxLine,MaxCol,Line,Col,East,South):-  write(Line), write(' ')
                                                          NextCol is Col + 1,
                                                          restrictNeighbors(MaxLine,MaxCol,Line,NextCol,East,South).
 
+/** SECOND RESCTRICTION */
+
+placement([],_,_,_,_).
+placement([P|Ps],East,South,MaxLine,MaxCol):- restrictPlacement(P,East,South,MaxLine,MaxCol),
+                                               write('NextLine \n'),
+                                              placement(Ps,East,South,MaxLine,MaxCol).
+
+
+restrictPlacement(Ps,East,South,MaxLine,MaxCol):- compileOptions(Ps,East,South,Result,MaxLine,MaxCol),
+                                                  sum(Result, #= , 1).
+
+compileOptions([],_,_,[],_,_):-write('FIM \n').
+%vertical
+compileOptions([L-C-0|Ps],East,South,[O|Os],MaxLine,MaxCol):-
+                                          SpaceIndex is (L - 1) * MaxLine + C + (L - 1),
+                                          element(SpaceIndex,South,O),
+                                          write('vertical \n'),
+                                          compileOptions(Ps,East,South,Os,MaxLine,MaxCol).
+%Horizontal
+compileOptions([L-C-1|Ps],East,South,[O|Os],MaxLine,MaxCol):-
+                                          SpaceIndex is (L - 1) * MaxLine + C + (L - 1),
+                                          element(SpaceIndex,East,O),
+                                          write('Horizontal \n'),
+                                          compileOptions(Ps,East,South,Os,MaxLine,MaxCol).
+
 % TODO O dominio de  line e COl ta certo ???  nao é  Width -1 e ...
 
 resolveDomino(Width,Height,N,Pieces):-
@@ -225,6 +259,10 @@ resolveDomino(Width,Height,N,Pieces):-
     delete(IPlaces, [], Places),
 
     write(Places), write('\n'),
+
+
+    placement(Places,East,South,Height,Width),
+    write('passou \n'),
     %validPlace(Line,Col,Direction,Places),
 
 
@@ -239,15 +277,15 @@ resolveDomino(Width,Height,N,Pieces):-
     write(Col),
     write('\n'),
     write(Direction).*/
-    labeling([], East),
-    labeling([], South),
+    append(East,South,Solution),
+    labeling([], Solution),
     write(East), write('\n'),
     write(South), write('\n').
 
 test:-    generate_pieces(4, Pieces), length(Pieces,N), write(N), write('\n'),!, resolveDomino(6,5,14,Pieces).
 
 
-test2:- generate_pieces(8, Pieces), write(Pieces),
+test2:- generate_pieces(4, Pieces), write(Pieces),
         listAllPlacements(Placements,Pieces),printa(Pieces,Placements).
 
 test4:- notEmpty(4,7).
