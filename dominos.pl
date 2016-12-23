@@ -272,14 +272,26 @@ printSouth([_|Ps],South,Count):-nth1(Count,South,0), write('    '),
                                 NewCount is Count +1,
                                 printSouth(Ps,South,NewCount).
 
+
+displayBoard([]).
+displayBoard([B|Bs]):- displayBoardLine(B), displayBoard(Bs).
+
+displayBoardLine([]):- write('\n\n').
+displayBoardLine([e|Ls]):- write('    '), displayBoardLine(Ls).
+displayBoardLine([L|Ls]):- write(L), write('   '), displayBoardLine(Ls).
+
+
 solveDomino1:- Width is 5, Height is 4, generate_pieces(4, Pieces), !,  table1(Board),
-                                        resolveDomino(Width, Height, Pieces, East, South, Board), !,
-                                        write('\n'), printSolution(Board, East, South, 1, Width).
+                                        resolveDomino(Width, Height, Pieces, East, South, Board), !, write('\n\n'),
+                                        displayBoard(Board),
+                                        write('\n\n'), printSolution(Board, East, South, 1, Width).
 
 solveDomino2:- Width is 6,Height is 5, generate_pieces(4, Pieces), !, table2(Board),
-                                       resolveDomino(Width, Height, Pieces, East, South, Board), !,
-                                       write('\n'), printSolution(Board, East, South, 1, Width).
+                                       resolveDomino(Width, Height, Pieces, East, South, Board), !, write('\n\n'),
+                                       displayBoard(Board),
+                                       write('\n\n'), printSolution(Board, East, South, 1, Width).
 
 solveDomino3:- Width is 15, Height is 8, generate_pieces(8, Pieces), !, table3(Board),
-                                         resolveDomino(Width, Height, Pieces, East, South, Board), !,
-                                         write('\n'), printSolution(Board, East, South, 1, Width).
+                                         resolveDomino(Width, Height, Pieces, East, South, Board), !, write('\n'),
+                                         displayBoard(Board),
+                                         write('\n\n'), printSolution(Board, East, South, 1, Width).
