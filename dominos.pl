@@ -101,7 +101,7 @@ restrictNeighbors(MaxLine,MaxCol,MaxLine,MaxCol,_,_, _).%:- write(MaxLine),write
 /** LAST LINE */
 restrictNeighbors(MaxLine,MaxCol,MaxLine,Col,East,South, Board):- notEmpty(MaxLine,Col, Board),
                                                                   %only up , Left, Right
-                                                                  SpaceIndex is (MaxLine - 1) * MaxLine + Col + (MaxLine - 1),
+                                                                  SpaceIndex is (MaxLine - 1) * MaxCol + Col ,
                                                                   Up is SpaceIndex - MaxCol,
                                                                   Left is SpaceIndex -1,
 
@@ -110,7 +110,7 @@ restrictNeighbors(MaxLine,MaxCol,MaxLine,Col,East,South, Board):- notEmpty(MaxLi
                                                                   element(Left,East,WestBorder),
                                                                   element(SpaceIndex,South,SouthBorder),
 
-                                                                  SouthBorder #= 0,
+                                                                  % SouthBorder #= 0,
                                                                   NorthBorder + EastBorder + WestBorder + SouthBorder#= 1,
 
                                                                   %write(MaxLine), write(' '), write(Col), write('\n'),
@@ -147,17 +147,18 @@ restrictNeighbors(MaxLine,MaxCol,Line,MaxCol,East,South, Board):- notEmpty(Line,
                                                                   element(SpaceIndex,South,SouthBorder),
                                                                   element(SpaceIndex,East,EastBorder),
 
-                                                                  EastBorder #= 0,
+                                                                  %EastBorder #= 0,
                                                                   NorthBorder + WestBorder + SouthBorder + EastBorder #= 1,
 
                                                                   restrictNeighbors(MaxLine,MaxCol,NextLine,1,East,South, Board).
 
 /** IN MIDDLE */
 restrictNeighbors(MaxLine,MaxCol,Line,Col,East,South, Board):-  notEmpty(Line,Col, Board),
-                                                                %write(Line), write(' '),write(Col), write(' \n'),
+                                                                write(Line), write(' '),write(Col), write(' \n'),
                                                                 % up down left right
-
+                                                             
                                                                 SpaceIndex is (Line - 1) * MaxCol + Col ,
+                                                             
                                                                 Up is SpaceIndex - MaxCol,
                                                                 Left is SpaceIndex - 1,
 
@@ -189,7 +190,7 @@ restrictNeighbors(MaxLine,MaxCol,Line,MaxCol,East,South, Board):-  write(Line),w
                                                                    restrictNeighbors(MaxLine,MaxCol,NextLine,0,East,South, Board).
 
 restrictNeighbors(MaxLine,MaxCol,Line,Col,East,South, Board):-  write(Line), write(' '),write(Col), write(' Vazio \n'),
-
+                                                                
                                                                 SpaceIndex is (Line - 1) * MaxCol + Col ,
                                                                 Up is SpaceIndex - MaxCol,
                                                                 Left is SpaceIndex - 1,
@@ -214,12 +215,12 @@ restrictPlacement(Ps,East,South,MaxLine,MaxCol):- compileOptions(Ps,East,South,R
 
 compileOptions([],_,_,[],_,_).%:-write('FIM \n').
 %vertical
-compileOptions([L-C-0|Ps],East,South,[O|Os],MaxLine,MaxCol):- SpaceIndex is (L - 1) * MaxLine + C + (L - 1),
+compileOptions([L-C-0|Ps],East,South,[O|Os],MaxLine,MaxCol):-  SpaceIndex is (L - 1) * MaxCol + C ,
                                                               element(SpaceIndex,South,O),
                                                              % write('vertical \n'),
                                                               compileOptions(Ps,East,South,Os,MaxLine,MaxCol).
 %Horizontal
-compileOptions([L-C-1|Ps],East,South,[O|Os],MaxLine,MaxCol):- SpaceIndex is (L - 1) * MaxLine + C + (L - 1),
+compileOptions([L-C-1|Ps],East,South,[O|Os],MaxLine,MaxCol):-  SpaceIndex is (L - 1) * MaxCol + C ,
                                                               element(SpaceIndex,East,O),
                                                             %  write('Horizontal \n'),
                                                               compileOptions(Ps,East,South,Os,MaxLine,MaxCol).
