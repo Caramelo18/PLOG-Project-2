@@ -257,10 +257,13 @@ printSolution([Line|Lines],East,South,Count,Width):-printEast(Line,East,Count),
 
 printEast([],_,_):- write('\n').
 % No border
+printEast([e|Ps],East,Count):- nth1(Count,East,0), write('    '),
+                               NewCount is Count +1,
+                               printEast(Ps,East,NewCount).
 printEast([P|Ps],East,Count):- nth1(Count,East,0),write(P), write('   '),
                                NewCount is Count +1,
                                printEast(Ps,East,NewCount).
-% with boarder
+% with border
 printEast([P|Ps],East,Count):- nth1(Count,East,1),write(P), write(' | '),
                                NewCount is Count +1,
                                printEast(Ps,East,NewCount).
