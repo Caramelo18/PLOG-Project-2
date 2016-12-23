@@ -53,6 +53,7 @@ restrictNeighbors(MaxLine,MaxCol,1,1,East,South, Board):- notEmpty(1,1, Board),
                                                           element(1,South,S0),
                                                           E0 + S0 #= 1,
                                                           %write('1 '),write('1'), write('\n'),
+                                                          !,
                                                           restrictNeighbors(MaxLine,MaxCol,1,2,East,South, Board).
 
 /** FIRST LINE & LAST COL */
@@ -65,6 +66,7 @@ restrictNeighbors(MaxLine,MaxCol,1,MaxCol,East,South, Board):- notEmpty(1,MaxCol
                                                                WestBorder + SouthBorder #= 1,
 
                                                                %write('1 '),write(MaxCol), write('MAX COL'),write('\n'),
+                                                               !,
                                                                restrictNeighbors(MaxLine,MaxCol,2,1,East,South, Board).
 /** FIRST LINE */
 restrictNeighbors(MaxLine,MaxCol,1,Col,East,South, Board):- notEmpty(1,Col, Board),
@@ -79,6 +81,7 @@ restrictNeighbors(MaxLine,MaxCol,1,Col,East,South, Board):- notEmpty(1,Col, Boar
 
                                                             %write('1 '),write(Col), write('\n'),
                                                             NextCol is Col + 1,
+                                                            !,
                                                             restrictNeighbors(MaxLine,MaxCol,1,NextCol,East,South, Board).
 
 /** LAST LINE & FIRST COL */
@@ -92,11 +95,11 @@ restrictNeighbors(MaxLine,MaxCol,MaxLine,1,East,South,Board):- notEmpty(MaxLine,
                                                                element(SpaceIndex,East,EastBorder),
 
                                                                NorthBorder + EastBorder #= 1,
-
+                                                               !,
                                                                restrictNeighbors(MaxLine,MaxCol,MaxLine,2,East,South, Board).
 
 /** LAST LINE & LAST COL */
-restrictNeighbors(MaxLine,MaxCol,MaxLine,MaxCol,_,_, _).%:- write(MaxLine),write(MaxCol), write('LAST'), write('\n').
+restrictNeighbors(MaxLine,MaxCol,MaxLine,MaxCol,_,_, _):-!.%:- write(MaxLine),write(MaxCol), write('LAST'), write('\n').
 
 /** LAST LINE */
 restrictNeighbors(MaxLine,MaxCol,MaxLine,Col,East,South, Board):- notEmpty(MaxLine,Col, Board),
@@ -115,6 +118,7 @@ restrictNeighbors(MaxLine,MaxCol,MaxLine,Col,East,South, Board):- notEmpty(MaxLi
 
                                                                   %write(MaxLine), write(' '), write(Col), write('\n'),
                                                                   NextCol is Col + 1,
+                                                                  !,
                                                                   restrictNeighbors(MaxLine,MaxCol,MaxLine,NextCol,East,South, Board).
 
 /** FIRST COL */
@@ -131,6 +135,7 @@ restrictNeighbors(MaxLine,MaxCol,Line,1,East,South, Board):- notEmpty(Line,1, Bo
                                                              element(SpaceIndex,South,SouthBorder),
 
                                                              NorthBorder + EastBorder + SouthBorder #= 1,
+                                                             !,
                                                              restrictNeighbors(MaxLine,MaxCol,Line,2, East,South, Board).
 /** LAST COL */
 restrictNeighbors(MaxLine,MaxCol,Line,MaxCol,East,South, Board):- notEmpty(Line,MaxCol, Board),
@@ -149,7 +154,7 @@ restrictNeighbors(MaxLine,MaxCol,Line,MaxCol,East,South, Board):- notEmpty(Line,
 
                                                                   EastBorder #= 0,
                                                                   NorthBorder + WestBorder + SouthBorder + EastBorder #= 1,
-
+                                                                  !,
                                                                   restrictNeighbors(MaxLine,MaxCol,NextLine,1,East,South, Board).
 
 /** IN MIDDLE */
@@ -170,6 +175,7 @@ restrictNeighbors(MaxLine,MaxCol,Line,Col,East,South, Board):-  notEmpty(Line,Co
                                                                 NorthBorder + WestBorder + SouthBorder + EastBorder #= 1,
 
                                                                 NextCol is Col + 1,
+                                                                !,
                                                                 restrictNeighbors(MaxLine,MaxCol,Line,NextCol,East,South, Board).
 
 
@@ -187,6 +193,7 @@ restrictNeighbors(MaxLine,MaxCol,Line,MaxCol,East,South, Board):-  %write(Line),
                                                                    element(SpaceIndex, South, 0),
 
                                                                    NextLine is Line + 1,
+                                                                   !,
                                                                    restrictNeighbors(MaxLine,MaxCol,NextLine,0,East,South, Board).
 
 restrictNeighbors(MaxLine,MaxCol,Line,Col,East,South, Board):-  %write(Line), write(' '),write(Col), write(' Vazio \n'),
@@ -200,6 +207,7 @@ restrictNeighbors(MaxLine,MaxCol,Line,Col,East,South, Board):-  %write(Line), wr
                                                                 element(SpaceIndex, East, 0),
 
                                                                 NextCol is Col + 1,
+                                                                !,
                                                                 restrictNeighbors(MaxLine,MaxCol,Line,NextCol,East,South, Board).
 
 /** SECOND RESCTRICTION */
@@ -303,22 +311,19 @@ solveDomino3:- Width is 15, Height is 8, generate_pieces(8, Pieces), !, table3(B
 /*** STATISTICS */
 
 
-stat1:-  Width is 5, Height is 4, generate_pieces(4, Pieces), !,  table1(Board),
-                                        reset_timer,
+stat1:-  reset_timer, Width is 5, Height is 4, generate_pieces(4, Pieces), !,  table1(Board),
                                         resolveDomino(Width, Height, Pieces, East, South, Board), !, write('\n\n'),
                                         print_time,
                                         displayBoard(Board),
                                         write('\n\n'), printSolution(Board, East, South, 1, Width).
 
-stat2:- Width is 6,Height is 5, generate_pieces(4, Pieces), !, table2(Board),
-                                       reset_timer,
+stat2:-    reset_timer,Width is 6,Height is 5, generate_pieces(4, Pieces), !, table2(Board),
                                        resolveDomino(Width, Height, Pieces, East, South, Board), !, write('\n\n'),
                                        print_time,
                                        displayBoard(Board),
                                        write('\n\n'), printSolution(Board, East, South, 1, Width).
 
-stat3:- Width is 15, Height is 8, generate_pieces(8, Pieces), !, table3(Board),
-                                         reset_timer,
+stat3:-  reset_timer, Width is 15, Height is 8, generate_pieces(8, Pieces), !, table3(Board),
                                          resolveDomino(Width, Height, Pieces, East, South, Board), !, write('\n'),
                                          print_time,
                                          displayBoard(Board),
@@ -328,6 +333,10 @@ stat3:- Width is 15, Height is 8, generate_pieces(8, Pieces), !, table3(Board),
 
 reset_timer :- statistics(walltime,_).	
 print_time :-
-	statistics(walltime,[_,T]),
+	statistics(walltime,[_,T|_]),
 	TS is ((T//10)*10)/1000,
-	nl, write('Time: '), write(TS), write('s'), nl, nl.
+	nl, write('Time: '), write(TS), write('s'),
+    fd_statistics,
+    nl, nl.
+
+  
