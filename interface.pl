@@ -37,7 +37,7 @@ displayMenu:- write('-----------------------------'), nl,
               write('| | 2 Solve Medium Domino | |'), nl,
               write('| | 3 Solve Hard Domino   | |'), nl,
               write('| | 4 Exit                | |'), nl,
-              write('------------------------------').
+              write('-----------------------------').
 
 
 selectBot:- nl,
@@ -48,10 +48,10 @@ showMenu(Puzzle):- displayStart,
                                displayMenu,
                                nl,
                                repeat,
-                               write('----------------------------'),
+                               write('-----------------------------'),
                                nl,
                                optionSelect(1,4,Puzzle),
-                               write('----------------------------'),
+                               write('-----------------------------\n'),
                                nl.
 
 
