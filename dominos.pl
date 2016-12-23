@@ -24,7 +24,7 @@ generate_piecesRow(_, _, List, List).
 getRow(Board, Row, Element):- nth1(Row, Board, Element).
 getCol(Row, Col, Element):- nth1(Col, Row, Element).
 
-getElement(Row, Col, Element, Board):- getRow(Board, Row, ERow), getCol(ERow, Col, Element). %TODO - change Board?
+getElement(Row, Col, Element, Board):- getRow(Board, Row, ERow), getCol(ERow, Col, Element).
 
 isValidPlacement(Line, Col, piece(A,B), Dir, Board):- getElement(Line, Col, A, Board), ((Line1 is Line+1, getElement(Line1, Col, B, Board), Dir is 0); %Vertical
                                                                                        ((Col1 is Col+1), getElement(Line, Col1, B, Board), Dir is 1)). %Horizontal
@@ -177,10 +177,27 @@ restrictNeighbors(MaxLine,MaxCol,Line,Col,East,South, Board):-  notEmpty(Line,Co
 /** EMPTY BOARD PLACE */
 
 restrictNeighbors(MaxLine,MaxCol,Line,MaxCol,East,South, Board):-  write(Line),write(MaxCol), write('Vazio'), write('\n'),
+                                                                   %up south, left east, south own must be 0
+                                                                   SpaceIndex is (Line - 1) * MaxCol + MaxCol,
+                                                                   Up is SpaceIndex - MaxCol,
+                                                                   Left is SpaceIndex - 1,
+                                                                   element(Up, South, 0),
+                                                                   element(Left, East, 0),
+                                                                   element(SpaceIndex, South, 0),
+
                                                                    NextLine is Line + 1,
                                                                    restrictNeighbors(MaxLine,MaxCol,NextLine,0,East,South, Board).
 
 restrictNeighbors(MaxLine,MaxCol,Line,Col,East,South, Board):-  write(Line), write(' '),write(Col), write(' Vazio \n'),
+
+                                                                SpaceIndex is (Line - 1) * MaxCol + Col ,
+                                                                Up is SpaceIndex - MaxCol,
+                                                                Left is SpaceIndex - 1,
+                                                                element(Up, South, 0),
+                                                                element(Left, East, 0),
+                                                                element(SpaceIndex, South, 0),
+                                                                element(SpaceIndex, East, 0),
+
                                                                 NextCol is Col + 1,
                                                                 restrictNeighbors(MaxLine,MaxCol,Line,NextCol,East,South, Board).
 
@@ -207,7 +224,7 @@ compileOptions([L-C-1|Ps],East,South,[O|Os],MaxLine,MaxCol):- SpaceIndex is (L -
                                                             %  write('Horizontal \n'),
                                                               compileOptions(Ps,East,South,Os,MaxLine,MaxCol).
 
-% TODO O dominio de  line e COl ta certo ???  nao é  Width -1 e ...
+
 resolveDomino(Width,Height,Pieces,East,South, Board):-
     Length is Width * Height,
     length(East, Length),
