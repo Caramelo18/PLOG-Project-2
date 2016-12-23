@@ -60,9 +60,9 @@ restrictNeighbors(MaxLine,MaxCol,1,MaxCol,East,South, Board):- notEmpty(1,MaxCol
                                                                %only left and down
                                                                Left is MaxCol - 1,
 
-                                                               element(Left,East,EastBorder),
+                                                               element(Left,East,WestBorder),
                                                                element(MaxCol,South,SouthBorder),
-                                                               EastBorder + SouthBorder #= 1,
+                                                               WestBorder + SouthBorder #= 1,
 
                                                                %write('1 '),write(MaxCol), write('MAX COL'),write('\n'),
                                                                restrictNeighbors(MaxLine,MaxCol,2,1,East,South, Board).
@@ -243,9 +243,9 @@ resolveDomino(Width,Height,Pieces,East,South, Board):-
 
     placement(Placements,East,South,Height,Width),
 
-    labeling([], Solution),
-    write(East), write('\n'),
-    write(South), write('\n').
+    labeling([], Solution).
+   % write(East), write('\n'),
+   %s write(South), write('\n').
 
 
 /** DISPLAY SOLUTION SECTION */
@@ -298,3 +298,36 @@ solveDomino3:- Width is 15, Height is 8, generate_pieces(8, Pieces), !, table3(B
                                          resolveDomino(Width, Height, Pieces, East, South, Board), !, write('\n'),
                                          displayBoard(Board),
                                          write('\n\n'), printSolution(Board, East, South, 1, Width).
+
+
+/*** STATISTICS */
+
+
+stat1:-  Width is 5, Height is 4, generate_pieces(4, Pieces), !,  table1(Board),
+                                        reset_timer,
+                                        resolveDomino(Width, Height, Pieces, East, South, Board), !, write('\n\n'),
+                                        print_time,
+                                        displayBoard(Board),
+                                        write('\n\n'), printSolution(Board, East, South, 1, Width).
+
+stat2:- Width is 6,Height is 5, generate_pieces(4, Pieces), !, table2(Board),
+                                       reset_timer,
+                                       resolveDomino(Width, Height, Pieces, East, South, Board), !, write('\n\n'),
+                                       print_time,
+                                       displayBoard(Board),
+                                       write('\n\n'), printSolution(Board, East, South, 1, Width).
+
+stat3:- Width is 15, Height is 8, generate_pieces(8, Pieces), !, table3(Board),
+                                         reset_timer,
+                                         resolveDomino(Width, Height, Pieces, East, South, Board), !, write('\n'),
+                                         print_time,
+                                         displayBoard(Board),
+                                         write('\n\n'), printSolution(Board, East, South, 1, Width).
+
+
+
+reset_timer :- statistics(walltime,_).	
+print_time :-
+	statistics(walltime,[_,T]),
+	TS is ((T//10)*10)/1000,
+	nl, write('Time: '), write(TS), write('s'), nl, nl.
